@@ -10,6 +10,7 @@ enum TokenType {
     RIGHT_PAREN,
     LEFT_BRACE,
     RIGHT_BRACE,
+    EOF,
 }
 
 impl Display for TokenType {
@@ -55,7 +56,10 @@ fn main() {
                 String::new()
             });
 
-            tokenizer(&file_contents);
+            let tokens = tokenizing(&file_contents);
+            for token in tokens {
+                println!(token);
+            }
         }
         _ => {
             eprintln!("Unknown command: {}", command);
@@ -63,7 +67,7 @@ fn main() {
     }
 }
 
-fn tokenizer(content: &String) {
+fn tokenizing(content: &String) -> Vec<Token> {
     let mut tokens: Vec<Token> = vec![];
     for char in content.chars() {
         match char {
@@ -74,5 +78,6 @@ fn tokenizer(content: &String) {
             _ => continue,
         }
     }
-    println!("EOF  null");
+    tokens.push(Token::new(TokenType::EOF, "", "null"));
+    tokens
 }
