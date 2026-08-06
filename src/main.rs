@@ -57,7 +57,7 @@ fn main() {
 }
 
 fn tokenizer(content: &String) {
-    let mut tokens: Vec<Token>;
+    let mut tokens: Vec<Token> = vec![];
     for char in content.chars() {
         match char {
             '(' => tokens.push(Token::new(TokenType::LEFT_PAREN, "(", "null")),
