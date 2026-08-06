@@ -2,10 +2,21 @@ use std::fmt::Display;
 #[allow(non_camel_case_types)]
 #[derive(Debug)]
 enum TokenType {
+    // Parenthesizes
     LEFT_PAREN,
     RIGHT_PAREN,
     LEFT_BRACE,
     RIGHT_BRACE,
+
+    STAR,
+    DOT,
+    SEMICOLON,
+    COMMA,
+    // Arithmetics
+    PLUS,
+    MINUS,
+    SLASH,
+
     EOF,
 }
 
@@ -21,11 +32,34 @@ pub struct Token {
     literal: String,
 }
 impl Token {
-    fn new(token_type: TokenType, lexme: &str, literal: &str) -> Token {
-        Token {
+    pub fn new(lexeme: &str) -> Option<Token> {
+        let token_type;
+        let mut literal = String::from("null");
+        match lexeme {
+            "(" => token_type = TokenType::LEFT_PAREN,
+            ")" => token_type = TokenType::RIGHT_PAREN,
+            "{" => token_type = TokenType::LEFT_BRACE,
+            "}" => token_type = TokenType::RIGHT_BRACE,
+            "," => token_type = TokenType::COMMA,
+            "." => token_type = TokenType::DOT,
+            "-" => token_type = TokenType::MINUS,
+            "+" => token_type = TokenType::PLUS,
+            ";" => token_type = TokenType::SEMICOLON,
+            "/" => token_type = TokenType::SLASH,
+            "*" => token_type = TokenType::STAR,
+            _ => return None,
+        }
+        Some(Token {
             token_type: token_type,
-            lexeme: lexme.to_string(),
-            literal: literal.to_string(),
+            lexeme: lexeme.to_string(),
+            literal: literal,
+        })
+    }
+    pub fn eof_token() -> Token {
+        Token {
+            token_type: TokenType::EOF,
+            lexeme: "".to_string(),
+            literal: "null".to_string(),
         }
     }
 }
@@ -34,17 +68,13 @@ impl Display for Token {
         write!(f, "{} {} {}", self.token_type, self.lexeme, self.literal)
     }
 }
-pub fn tokenizing(content: &String) -> Vec<Token> {
+pub fn scanning(content: &String) -> Vec<Token> {
     let mut tokens: Vec<Token> = vec![];
     for char in content.chars() {
-        match char {
-            '(' => tokens.push(Token::new(TokenType::LEFT_PAREN, "(", "null")),
-            ')' => tokens.push(Token::new(TokenType::RIGHT_PAREN, ")", "null")),
-            '{' => tokens.push(Token::new(TokenType::LEFT_BRACE, "{", "null")),
-            '}' => tokens.push(Token::new(TokenType::RIGHT_BRACE, "}", "null")),
-            _ => continue,
+        if let Some(token) = Token::new(&char.to_string()) {
+            tokens.push(token);
         }
     }
-    tokens.push(Token::new(TokenType::EOF, "", "null"));
+    tokens.push(Token::eof_token());
     tokens
 }

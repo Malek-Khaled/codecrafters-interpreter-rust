@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 use std::env;
 use std::fs;
-use token::tokenizing;
+use token::scanning;
 
 mod token;
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
                 String::new()
             });
 
-            let tokens = tokenizing(&file_contents);
+            let tokens = scanning(&file_contents);
             for token in tokens {
                 println!("{}", token);
             }
