@@ -58,7 +58,7 @@ fn main() {
 
             let tokens = tokenizing(&file_contents);
             for token in tokens {
-                println!(token);
+                println!("{}", token);
             }
         }
         _ => {
