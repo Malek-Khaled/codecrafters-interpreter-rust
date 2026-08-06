@@ -4,6 +4,7 @@ use std::fmt::Display;
 use std::fs;
 
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 enum TokenType {
     LEFT_PAREN,
     RIGHT_PAREN,
