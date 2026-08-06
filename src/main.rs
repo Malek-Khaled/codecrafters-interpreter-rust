@@ -22,6 +22,7 @@ fn main() {
             });
 
             let tokens = scanning(&file_contents);
+            dbg!(&tokens);
             for token in tokens {
                 println!("{}", token);
             }
