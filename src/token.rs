@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, process::exit};
 #[allow(non_camel_case_types)]
 #[derive(Debug)]
 enum TokenType {
@@ -78,6 +78,7 @@ pub fn scanning(content: &String) -> Vec<Token> {
             line += 1;
         } else {
             eprintln!("[line {line}] Error: Unexpected character:{char}");
+            exit(65);
         }
     }
     tokens.push(Token::eof_token());
