@@ -4,11 +4,12 @@ use std::fs;
 use token::scanning;
 
 mod token;
-fn main() {
+fn main() -> i32 {
+    let mut exit_code = 0;
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
         eprintln!("Usage: {} tokenize <filename>", args[0]);
-        return;
+        return 0;
     }
 
     let command = &args[1];
@@ -21,8 +22,8 @@ fn main() {
                 String::new()
             });
 
-            let tokens = scanning(&file_contents);
-            dbg!(&tokens);
+            let (tokens, exit_code_scan) = scanning(&file_contents);
+            exit_code = exit_code_scan;
             for token in tokens {
                 println!("{}", token);
             }
@@ -31,4 +32,5 @@ fn main() {
             eprintln!("Unknown command: {}", command);
         }
     }
+    return exit_code;
 }

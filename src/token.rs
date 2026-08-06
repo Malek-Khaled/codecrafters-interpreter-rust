@@ -69,7 +69,8 @@ impl Display for Token {
         write!(f, "{} {} {}", self.token_type, self.lexeme, self.literal)
     }
 }
-pub fn scanning(content: &String) -> Vec<Token> {
+pub fn scanning(content: &String) -> (Vec<Token>, i32) {
+    let mut exit_code = 0;
     let mut tokens: Vec<Token> = vec![];
     let mut line = 1;
     for char in content.chars() {
@@ -79,9 +80,9 @@ pub fn scanning(content: &String) -> Vec<Token> {
             line += 1;
         } else {
             eprintln!("[line {line}] Error: Unexpected character: {char}");
-            exit(65);
+            exit_code = 65;
         }
     }
     tokens.push(Token::eof_token());
-    tokens
+    (tokens, exit_code)
 }
