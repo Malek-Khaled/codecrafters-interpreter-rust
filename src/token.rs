@@ -70,9 +70,14 @@ impl Display for Token {
 }
 pub fn scanning(content: &String) -> Vec<Token> {
     let mut tokens: Vec<Token> = vec![];
+    let mut line = 0;
     for char in content.chars() {
         if let Some(token) = Token::new(&char.to_string()) {
             tokens.push(token);
+        } else if char == '\n' {
+            line += 1;
+        } else {
+            eprintln!("[line {line}] Error: Unexpected character:{char}");
         }
     }
     tokens.push(Token::eof_token());
