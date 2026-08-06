@@ -1,3 +1,4 @@
+use std::fmt::Display;
 #[allow(non_camel_case_types)]
 #[derive(Debug)]
 enum TokenType {
