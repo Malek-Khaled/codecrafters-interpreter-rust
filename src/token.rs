@@ -77,7 +77,7 @@ pub fn scanning(content: &String) -> Vec<Token> {
         } else if char == '\n' {
             line += 1;
         } else {
-            eprintln!("[line {line}] Error: Unexpected character:{char}");
+            eprintln!("[line {line}] Error: Unexpected character: {char}");
             exit(65);
         }
     }
