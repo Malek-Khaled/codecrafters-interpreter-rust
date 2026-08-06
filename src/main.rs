@@ -1,8 +1,7 @@
 #![allow(unused_variables)]
 use std::env;
-use std::fmt::Display;
 use std::fs;
-use token::*;
+use token::tokenizing;
 
 mod token;
 fn main() {
@@ -31,19 +30,4 @@ fn main() {
             eprintln!("Unknown command: {}", command);
         }
     }
-}
-
-fn tokenizing(content: &String) -> Vec<Token> {
-    let mut tokens: Vec<Token> = vec![];
-    for char in content.chars() {
-        match char {
-            '(' => tokens.push(Token::new(TokenType::LEFT_PAREN, "(", "null")),
-            ')' => tokens.push(Token::new(TokenType::RIGHT_PAREN, ")", "null")),
-            '{' => tokens.push(Token::new(TokenType::LEFT_BRACE, "{", "null")),
-            '}' => tokens.push(Token::new(TokenType::RIGHT_BRACE, "}", "null")),
-            _ => continue,
-        }
-    }
-    tokens.push(Token::new(TokenType::EOF, "", "null"));
-    tokens
 }

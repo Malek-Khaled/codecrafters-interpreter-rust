@@ -34,3 +34,17 @@ impl Display for Token {
         write!(f, "{} {} {}", self.token_type, self.lexeme, self.literal)
     }
 }
+pub fn tokenizing(content: &String) -> Vec<Token> {
+    let mut tokens: Vec<Token> = vec![];
+    for char in content.chars() {
+        match char {
+            '(' => tokens.push(Token::new(TokenType::LEFT_PAREN, "(", "null")),
+            ')' => tokens.push(Token::new(TokenType::RIGHT_PAREN, ")", "null")),
+            '{' => tokens.push(Token::new(TokenType::LEFT_BRACE, "{", "null")),
+            '}' => tokens.push(Token::new(TokenType::RIGHT_BRACE, "}", "null")),
+            _ => continue,
+        }
+    }
+    tokens.push(Token::new(TokenType::EOF, "", "null"));
+    tokens
+}
