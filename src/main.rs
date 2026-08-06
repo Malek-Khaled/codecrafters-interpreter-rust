@@ -32,6 +32,7 @@ fn tokenizer(content: &String) {
         match char {
             '(' => println!("LEFT_PAREN ( null"),
             ')' => println!("RIGHT_PAREN ) null"),
+            _ => continue,
         }
     }
     println!("EOF  null");
