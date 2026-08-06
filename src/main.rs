@@ -11,6 +11,12 @@ enum TokenType {
     RIGHT_BRACE,
 }
 
+impl Display for TokenType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 struct Token {
     token_type: TokenType,
     lexeme: String,
