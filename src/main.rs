@@ -1,15 +1,16 @@
 #![allow(unused_variables)]
 use std::env;
 use std::fs;
+use std::process::exit;
 use token::scanning;
 
 mod token;
-fn main() -> i32 {
+fn main() {
     let mut exit_code = 0;
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
         eprintln!("Usage: {} tokenize <filename>", args[0]);
-        return 0;
+        exit(exit_code);
     }
 
     let command = &args[1];
@@ -32,5 +33,5 @@ fn main() -> i32 {
             eprintln!("Unknown command: {}", command);
         }
     }
-    return exit_code;
+    exit(exit_code);
 }
