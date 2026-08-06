@@ -21,6 +21,7 @@ fn main() {
                 String::new()
             });
 
+            dbg!(&file_contents);
             let tokens = scanning(&file_contents);
             for token in tokens {
                 println!("{}", token);
