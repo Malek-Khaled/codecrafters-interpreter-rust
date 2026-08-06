@@ -2,6 +2,7 @@
 use std::env;
 use std::fmt::Display;
 use std::fs;
+use token::*;
 
 mod token;
 fn main() {
