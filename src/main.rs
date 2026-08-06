@@ -1,7 +1,6 @@
 #![allow(unused_variables)]
 use std::env;
 use std::fs;
-use token::tokenizing;
 
 mod token;
 fn main() {
