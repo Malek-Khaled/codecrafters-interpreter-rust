@@ -21,6 +21,10 @@ enum TokenType {
     EQUAL_EQUAL,
     BANG,
     BANG_EQUAL,
+    LESS,
+    LESS_EQUAL,
+    GREATER,
+    GREATER_EQUAL,
 
     EOF,
 }
@@ -56,6 +60,10 @@ impl Token {
             "=" => TokenType::EQUAL,
             "!" => TokenType::BANG,
             "!=" => TokenType::BANG_EQUAL,
+            "<" => TokenType::LESS,
+            "<=" => TokenType::LESS_EQUAL,
+            ">" => TokenType::GREATER,
+            ">=" => TokenType::GREATER_EQUAL,
             _ => return None,
         };
         Some(Token {
@@ -106,21 +114,12 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
 
 fn match_op<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
     let lexeme = content[*char_index];
-    match lexeme {
-        '=' => match content.get(*char_index + 1) {
-            Some('=') => {
-                *char_index += 1;
-                "==".to_string()
-            }
-            _ => lexeme.to_string(),
-        },
-        '!' => match content.get(*char_index + 1) {
-            Some('=') => {
-                *char_index += 1;
-                "!=".to_string()
-            }
-            _ => lexeme.to_string(),
-        },
-        _ => lexeme.to_string(),
-    }
+    let operators = ['=', '!', '<', '>'];
+    if operators.contains(&lexeme) && content.get(*char_index + 1).is_some() {
+        if content[*char_index + 1] == '=' {
+            *char_index += 1;
+            return format!("{lexeme}=");
+        };
+    };
+    lexeme.to_string()
 }
