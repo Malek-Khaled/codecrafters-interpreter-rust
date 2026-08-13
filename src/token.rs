@@ -123,3 +123,12 @@ fn match_op<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
     };
     lexeme.to_string()
 }
+fn comment_skiping<'a>(char_index: &'a mut usize, content: &'a [char]) {
+    for i in *char_index..content.len() {
+        if content[i] != '\n' {
+            *char_index += 1;
+        } else {
+            break;
+        }
+    }
+}
