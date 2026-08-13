@@ -1,4 +1,4 @@
-use std::{fmt::Display, ops::Add, process::exit};
+use std::fmt::Display;
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug)]
@@ -36,35 +36,27 @@ pub struct Token {
     literal: String,
 }
 impl Token {
-    pub fn new(lexeme_index: &mut usize, content: &[char], tokens: &[Token]) -> Option<Token> {
-        let token_type;
-        let mut lexeme = content[*lexeme_index].to_string();
+    pub fn new(lexeme: &str) -> Option<Token> {
         let mut literal = String::from("null");
-        match lexeme.as_str() {
-            "(" => token_type = TokenType::LEFT_PAREN,
-            ")" => token_type = TokenType::RIGHT_PAREN,
-            "{" => token_type = TokenType::LEFT_BRACE,
-            "}" => token_type = TokenType::RIGHT_BRACE,
-            "," => token_type = TokenType::COMMA,
-            "." => token_type = TokenType::DOT,
-            "-" => token_type = TokenType::MINUS,
-            "+" => token_type = TokenType::PLUS,
-            ";" => token_type = TokenType::SEMICOLON,
-            "/" => token_type = TokenType::SLASH,
-            "*" => token_type = TokenType::STAR,
-            "=" => {
-                if let Some(res) = scan_operator(lexeme_index, content) {
-                    token_type = res.0;
-                    lexeme = res.1.to_string();
-                } else {
-                    token_type = TokenType::EQUAL;
-                }
-            }
+        let token_type = match lexeme {
+            "(" => TokenType::LEFT_PAREN,
+            ")" => TokenType::RIGHT_PAREN,
+            "{" => TokenType::LEFT_BRACE,
+            "}" => TokenType::RIGHT_BRACE,
+            "," => TokenType::COMMA,
+            "." => TokenType::DOT,
+            "-" => TokenType::MINUS,
+            "+" => TokenType::PLUS,
+            ";" => TokenType::SEMICOLON,
+            "/" => TokenType::SLASH,
+            "*" => TokenType::STAR,
+            "==" => TokenType::EQUAL_EQUAL,
+            "=" => TokenType::EQUAL,
             _ => return None,
-        }
+        };
         Some(Token {
             token_type,
-            lexeme,
+            lexeme: lexeme.to_string(),
             literal,
         })
     }
@@ -89,7 +81,7 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     let vec_chars: Vec<char> = content.chars().collect();
     let mut i = 0;
     while i < vec_chars.len() {
-        match Token::new(&mut i, &vec_chars, &tokens) {
+        match Token::new(&match_op(&mut i, &vec_chars)) {
             Some(token) => tokens.push(token),
             None => match &vec_chars[i] {
                 '\n' => line += 1,
@@ -108,18 +100,16 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     (tokens, exit_code)
 }
 
-fn scan_operator<'a>(
-    char_index: &'a mut usize,
-    content: &'a [char],
-) -> Option<(TokenType, &'a str)> {
-    match content[*char_index] {
+fn match_op<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
+    let lexeme = content[*char_index];
+    match lexeme {
         '=' => match content.get(*char_index + 1) {
             Some('=') => {
                 *char_index += 1;
-                Some((TokenType::EQUAL_EQUAL, "=="))
+                "==".to_string()
             }
-            _ => None,
+            _ => lexeme.to_string(),
         },
-        _ => None,
+        _ => lexeme.to_string(),
     }
 }
