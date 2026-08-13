@@ -19,6 +19,8 @@ enum TokenType {
     SLASH,
     EQUAL,
     EQUAL_EQUAL,
+    BANG,
+    BANG_EQUAL,
 
     EOF,
 }
@@ -52,6 +54,8 @@ impl Token {
             "*" => TokenType::STAR,
             "==" => TokenType::EQUAL_EQUAL,
             "=" => TokenType::EQUAL,
+            "!" => TokenType::BANG,
+            "!=" => TokenType::BANG_EQUAL,
             _ => return None,
         };
         Some(Token {
@@ -107,6 +111,13 @@ fn match_op<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
             Some('=') => {
                 *char_index += 1;
                 "==".to_string()
+            }
+            _ => lexeme.to_string(),
+        },
+        '!' => match content.get(*char_index + 1) {
+            Some('=') => {
+                *char_index += 1;
+                "!=".to_string()
             }
             _ => lexeme.to_string(),
         },
