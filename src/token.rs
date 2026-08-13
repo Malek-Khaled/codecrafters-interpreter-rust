@@ -115,8 +115,7 @@ fn scan_operator<'a>(
     match content[*char_index] {
         '=' => match content.get(*char_index + 1) {
             Some('=') => {
-                *char_index += 2;
-                dbg!(&char_index);
+                *char_index += 1;
                 Some((TokenType::EQUAL_EQUAL, "=="))
             }
             _ => None,
