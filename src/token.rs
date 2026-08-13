@@ -1,5 +1,6 @@
-use std::{fmt::Display, process::exit};
+use std::{fmt::Display, ops::Add, process::exit};
 #[allow(non_camel_case_types)]
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug)]
 enum TokenType {
     // Parenthesizes
@@ -35,9 +36,9 @@ pub struct Token {
     literal: String,
 }
 impl Token {
-    pub fn new(lexeme_index: usize, content: &[char]) -> Option<Token> {
+    pub fn new(lexeme_index: &mut usize, content: &[char], tokens: &[Token]) -> Option<Token> {
         let token_type;
-        let mut lexeme = content[lexeme_index].to_string();
+        let mut lexeme = content[*lexeme_index].to_string();
         let mut literal = String::from("null");
         match lexeme.as_str() {
             "(" => token_type = TokenType::LEFT_PAREN,
@@ -62,9 +63,9 @@ impl Token {
             _ => return None,
         }
         Some(Token {
-            token_type: token_type,
-            lexeme: lexeme,
-            literal: literal,
+            token_type,
+            lexeme,
+            literal,
         })
     }
     pub fn eof() -> Token {
@@ -81,13 +82,14 @@ impl Display for Token {
     }
 }
 
-pub fn scanning(content: &String) -> (Vec<Token>, i32) {
+pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     let mut exit_code = 0;
     let mut tokens: Vec<Token> = vec![];
     let mut line = 1;
     let vec_chars: Vec<char> = content.chars().collect();
-    for i in 0..vec_chars.len() {
-        match Token::new(i, &vec_chars) {
+    let mut i = 0;
+    while i < vec_chars.len() {
+        match Token::new(&mut i, &vec_chars, &tokens) {
             Some(token) => tokens.push(token),
             None => match &vec_chars[i] {
                 '\n' => line += 1,
@@ -100,16 +102,24 @@ pub fn scanning(content: &String) -> (Vec<Token>, i32) {
                 }
             },
         }
+        i += 1;
     }
     tokens.push(Token::eof());
     (tokens, exit_code)
 }
 
-fn scan_operator(char_index: usize, content: &[char]) -> Option<(TokenType, &str)> {
-    match content[char_index] {
-        '=' => match content.get(char_index + 1) {
-            Some('=') => Some((TokenType::EQUAL_EQUAL, "==")),
-            _ => return None,
+fn scan_operator<'a>(
+    char_index: &'a mut usize,
+    content: &'a [char],
+) -> Option<(TokenType, &'a str)> {
+    match content[*char_index] {
+        '=' => match content.get(*char_index + 1) {
+            Some('=') => {
+                *char_index += 2;
+                dbg!(&char_index);
+                Some((TokenType::EQUAL_EQUAL, "=="))
+            }
+            _ => None,
         },
         _ => None,
     }
