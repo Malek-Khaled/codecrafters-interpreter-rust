@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{char, fmt::Display};
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug)]
@@ -93,18 +93,20 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     let vec_chars: Vec<char> = content.chars().collect();
     let mut i = 0;
     while i < vec_chars.len() {
-        match Token::new(&match_op(&mut i, &vec_chars)) {
-            Some(token) => tokens.push(token),
-            None => match &vec_chars[i] {
-                '\n' => line += 1,
-                _ => {
-                    eprintln!(
-                        "[line {line}] Error: Unexpected character: {char}",
-                        char = vec_chars[i]
-                    );
-                    exit_code = 65;
-                }
-            },
+        if let Some(value) = check_multi_char(&mut i, &vec_chars) {
+            match Token::new(&value) {
+                Some(token) => tokens.push(token),
+                None => match &vec_chars[i] {
+                    '\n' => line += 1,
+                    _ => {
+                        eprintln!(
+                            "[line {line}] Error: Unexpected character: {char}",
+                            char = vec_chars[i]
+                        );
+                        exit_code = 65;
+                    }
+                },
+            }
         }
         i += 1;
     }
@@ -112,16 +114,21 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     (tokens, exit_code)
 }
 
-fn match_op<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
+fn check_multi_char<'a>(char_index: &'a mut usize, content: &'a [char]) -> Option<String> {
     let lexeme = content[*char_index];
     let operators = ['=', '!', '<', '>'];
     if operators.contains(&lexeme) && content.get(*char_index + 1).is_some() {
         if content[*char_index + 1] == '=' {
             *char_index += 1;
-            return format!("{lexeme}=");
+            return Some(format!("{lexeme}="));
         };
-    };
-    lexeme.to_string()
+    } else if lexeme == '/' && content.get(*char_index + 1).is_some() {
+        if content[*char_index + 1] == '/' {
+            comment_skiping(char_index, content);
+            return None;
+        }
+    }
+    Some(lexeme.to_string())
 }
 fn comment_skiping<'a>(char_index: &'a mut usize, content: &'a [char]) {
     for i in *char_index..content.len() {
