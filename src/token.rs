@@ -98,8 +98,7 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
                 Some(token) => tokens.push(token),
                 None => match &vec_chars[i] {
                     '\n' => line += 1,
-                    ' ' => {}
-                    '\t' => {}
+                    ' ' | '\t' | '\r' => {}
                     _ => {
                         eprintln!(
                             "[line {line}] Error: Unexpected character: {char}",
@@ -137,6 +136,8 @@ fn comment_skiping<'a>(char_index: &'a mut usize, content: &'a [char]) {
         if content[i] != '\n' {
             *char_index += 1;
         } else {
+            // Subtract by 1 to get through \n on the next loop
+            *char_index -= 1;
             break;
         }
     }
