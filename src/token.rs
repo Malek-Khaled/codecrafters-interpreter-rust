@@ -98,6 +98,8 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
                 Some(token) => tokens.push(token),
                 None => match &vec_chars[i] {
                     '\n' => line += 1,
+                    ' ' => {}
+                    '\t' => {}
                     _ => {
                         eprintln!(
                             "[line {line}] Error: Unexpected character: {char}",
