@@ -99,6 +99,7 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
                 None => match &vec_chars[i] {
                     '\n' => line += 1,
                     ' ' | '\t' | '\r' => {}
+                    '\"' => scan_literal(&mut i, &vec_chars),
                     _ => {
                         eprintln!(
                             "[line {line}] Error: Unexpected character: {char}",
@@ -141,4 +142,15 @@ fn comment_skiping<'a>(char_index: &'a mut usize, content: &'a [char]) {
             break;
         }
     }
+}
+
+fn scan_literal<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
+    let mut literal = String::new();
+    for i in *char_index..content.len() {
+        literal.push(content[i]);
+        if content[i] == '\"' {
+            break;
+        }
+    }
+    literal
 }
