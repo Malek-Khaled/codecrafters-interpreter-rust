@@ -23,8 +23,7 @@ fn main() {
                 String::new()
             });
 
-            let (tokens, exit_code_scan) = scanning(&file_contents);
-            exit_code = exit_code_scan;
+            let tokens = scanning(&file_contents, &mut exit_code);
             for token in tokens {
                 println!("{}", token);
             }

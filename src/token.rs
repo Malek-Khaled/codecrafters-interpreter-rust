@@ -1,7 +1,4 @@
-use std::{
-    char,
-    fmt::{Display, Formatter},
-};
+use std::{char, fmt::Display};
 
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
@@ -95,20 +92,20 @@ impl Token {
         }
     }
 }
+
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {} {}", self.token_type, self.lexeme, self.literal)
     }
 }
 
-pub fn scanning(content: &str) -> (Vec<Token>, i32) {
-    let mut exit_code = 0;
+pub fn scanning(content: &str, exit_code: &mut i32) -> Vec<Token> {
     let mut tokens: Vec<Token> = vec![];
     let mut line = 1;
     let vec_chars: Vec<char> = content.chars().collect();
     let mut i = 0;
     while i < vec_chars.len() {
-        if let Some(value) = check_multi_char(&mut i, &vec_chars, &mut line) {
+        if let Some(value) = check_multi_char(&mut i, &vec_chars, &mut line, exit_code) {
             match Token::new(&value) {
                 Some(token) => tokens.push(token),
                 None => match &vec_chars[i] {
@@ -119,7 +116,7 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
                             "[line {line}] Error: Unexpected character: {char}",
                             char = vec_chars[i]
                         );
-                        exit_code = 65;
+                        *exit_code = 65;
                     }
                 },
             }
@@ -127,13 +124,14 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
         i += 1;
     }
     tokens.push(Token::eof());
-    (tokens, exit_code)
+    tokens
 }
 
 fn check_multi_char<'a>(
     char_index: &'a mut usize,
     content: &'a [char],
     current_line: &'a mut i32,
+    exit_code: &'a mut i32,
 ) -> Option<String> {
     #![allow(clippy::collapsible_if)]
     let lexeme = content[*char_index];
@@ -149,7 +147,7 @@ fn check_multi_char<'a>(
             return None;
         }
     } else if lexeme == '"' {
-        match scan_literal(char_index, content, current_line) {
+        match scan_literal(char_index, content, current_line, exit_code) {
             Ok(value) => {
                 return Some(value);
             }
@@ -177,6 +175,7 @@ fn scan_literal<'a>(
     char_index: &'a mut usize,
     content: &'a [char],
     current_line: &'a mut i32,
+    exit_code: &'a mut i32,
 ) -> Result<String, String> {
     let mut literal = String::from('"');
     for i in *char_index + 1..content.len() {
@@ -186,7 +185,8 @@ fn scan_literal<'a>(
             return Ok(literal);
         }
     }
-    let error_message = format!("[Line{current_line}] Error: Unterminated string.");
+    let error_message = format!("[Line {current_line}] Error: Unterminated string.");
+    *exit_code = 65;
     Err(error_message)
 }
 
