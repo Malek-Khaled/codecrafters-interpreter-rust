@@ -1,7 +1,11 @@
-use std::{char, fmt::Display};
+use std::{
+    char,
+    fmt::{Display, Formatter},
+};
+
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum TokenType {
     // Parenthesizes
     LEFT_PAREN,
@@ -25,6 +29,8 @@ enum TokenType {
     LESS_EQUAL,
     GREATER,
     GREATER_EQUAL,
+
+    STRING,
 
     EOF,
 }
@@ -64,8 +70,17 @@ impl Token {
             "<=" => TokenType::LESS_EQUAL,
             ">" => TokenType::GREATER,
             ">=" => TokenType::GREATER_EQUAL,
-            _ => return None,
+            _ => {
+                if lexeme.starts_with('"') && lexeme.ends_with('"') {
+                    TokenType::STRING
+                } else {
+                    return None;
+                }
+            }
         };
+        if token_type == TokenType::STRING {
+            literal = format_str(lexeme);
+        }
         Some(Token {
             token_type,
             lexeme: lexeme.to_string(),
@@ -93,13 +108,12 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     let vec_chars: Vec<char> = content.chars().collect();
     let mut i = 0;
     while i < vec_chars.len() {
-        if let Some(value) = check_multi_char(&mut i, &vec_chars) {
+        if let Some(value) = check_multi_char(&mut i, &vec_chars, &mut line) {
             match Token::new(&value) {
                 Some(token) => tokens.push(token),
                 None => match &vec_chars[i] {
                     '\n' => line += 1,
                     ' ' | '\t' | '\r' => {}
-                    '\"' => scan_literal(&mut i, &vec_chars),
                     _ => {
                         eprintln!(
                             "[line {line}] Error: Unexpected character: {char}",
@@ -116,7 +130,12 @@ pub fn scanning(content: &str) -> (Vec<Token>, i32) {
     (tokens, exit_code)
 }
 
-fn check_multi_char<'a>(char_index: &'a mut usize, content: &'a [char]) -> Option<String> {
+fn check_multi_char<'a>(
+    char_index: &'a mut usize,
+    content: &'a [char],
+    current_line: &'a mut i32,
+) -> Option<String> {
+    #![allow(clippy::collapsible_if)]
     let lexeme = content[*char_index];
     let operators = ['=', '!', '<', '>'];
     if operators.contains(&lexeme) && content.get(*char_index + 1).is_some() {
@@ -129,6 +148,16 @@ fn check_multi_char<'a>(char_index: &'a mut usize, content: &'a [char]) -> Optio
             comment_skiping(char_index, content);
             return None;
         }
+    } else if lexeme == '"' {
+        match scan_literal(char_index, content, current_line) {
+            Ok(value) => {
+                return Some(value);
+            }
+            Err(message) => {
+                println!("{}", message);
+                return None;
+            }
+        };
     }
     Some(lexeme.to_string())
 }
@@ -144,13 +173,23 @@ fn comment_skiping<'a>(char_index: &'a mut usize, content: &'a [char]) {
     }
 }
 
-fn scan_literal<'a>(char_index: &'a mut usize, content: &'a [char]) -> String {
-    let mut literal = String::new();
-    for i in *char_index..content.len() {
+fn scan_literal<'a>(
+    char_index: &'a mut usize,
+    content: &'a [char],
+    current_line: &'a mut i32,
+) -> Result<String, String> {
+    let mut literal = String::from('"');
+    for i in *char_index + 1..content.len() {
         literal.push(content[i]);
+        *char_index = i;
         if content[i] == '\"' {
-            break;
+            return Ok(literal);
         }
     }
-    literal
+    let error_message = format!("[Line{current_line}] Error: Unterminated string.");
+    Err(error_message)
+}
+
+fn format_str(str: &str) -> String {
+    str[1..str.len() - 1].to_string()
 }
