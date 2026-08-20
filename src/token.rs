@@ -152,7 +152,7 @@ fn check_multi_char<'a>(
                 return Some(value);
             }
             Err(message) => {
-                println!("{}", message);
+                eprintln!("{}", message);
                 return None;
             }
         };
@@ -185,7 +185,7 @@ fn scan_literal<'a>(
             return Ok(literal);
         }
     }
-    let error_message = format!("[Line {current_line}] Error: Unterminated string.");
+    let error_message = format!("[line {current_line}] Error: Unterminated string.");
     *exit_code = 65;
     Err(error_message)
 }
