@@ -1,4 +1,4 @@
-use numfmt::Formatter;
+use numfmt::{Formatter, Precision};
 use std::{char, fmt::Display};
 
 #[allow(non_camel_case_types)]
@@ -48,6 +48,7 @@ pub struct Token {
 }
 impl Token {
     pub fn new(lexeme: &str) -> Option<Token> {
+        dbg!(lexeme);
         let mut literal = String::from("null");
         let token_type = match lexeme {
             "(" => TokenType::LEFT_PAREN,
@@ -81,6 +82,10 @@ impl Token {
         };
         if token_type == TokenType::STRING {
             literal = format_str(lexeme);
+        } else if token_type == TokenType::NUMERIC {
+            let num: i32 = lexeme.parse().unwrap();
+            let format_num: Formatter = "[.*]".parse().unwrap();
+            literal = format_num.fmt_string(num);
         }
         Some(Token {
             token_type,
@@ -162,20 +167,16 @@ fn check_multi_char<'a>(
         };
     } else if lexeme.is_numeric() {
         let beginning = *char_index;
-        let mut num = 0;
+        let mut str_num = String::from(lexeme);
         for i in *char_index + 1..content.len() {
-            if !content[i].is_numeric() || !content[i].eq(&'.') {
+            if content[i].is_numeric() || content[i].eq(&'.') {
+                str_num.push(content[i]);
+            } else {
                 *char_index = i;
-                num = (content[beginning]..content[i])
-                    .collect::<String>()
-                    .parse()
-                    .unwrap();
                 break;
             }
         }
-        dbg!(&number);
-
-        return Some(number);
+        return Some(str_num);
     }
     Some(lexeme.to_string())
 }
