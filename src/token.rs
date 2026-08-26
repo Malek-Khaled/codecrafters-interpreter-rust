@@ -1,3 +1,4 @@
+use numfmt::Formatter;
 use std::{char, fmt::Display};
 
 #[allow(non_camel_case_types)]
@@ -28,6 +29,7 @@ enum TokenType {
     GREATER_EQUAL,
 
     STRING,
+    NUMERIC,
 
     EOF,
 }
@@ -70,6 +72,8 @@ impl Token {
             _ => {
                 if lexeme.starts_with('"') && lexeme.ends_with('"') {
                     TokenType::STRING
+                } else if literal.chars().any(|c| c.is_numeric()) {
+                    TokenType::NUMERIC
                 } else {
                     return None;
                 }
@@ -156,6 +160,22 @@ fn check_multi_char<'a>(
                 return None;
             }
         };
+    } else if lexeme.is_numeric() {
+        let beginning = *char_index;
+        let mut num = 0;
+        for i in *char_index + 1..content.len() {
+            if !content[i].is_numeric() || !content[i].eq(&'.') {
+                *char_index = i;
+                num = (content[beginning]..content[i])
+                    .collect::<String>()
+                    .parse()
+                    .unwrap();
+                break;
+            }
+        }
+        dbg!(&number);
+
+        return Some(number);
     }
     Some(lexeme.to_string())
 }
