@@ -26,6 +26,7 @@ enum TokenType {
     LESS_EQUAL,
     GREATER,
     GREATER_EQUAL,
+    IDENTIFIER,
 
     STRING,
     NUMBER,
