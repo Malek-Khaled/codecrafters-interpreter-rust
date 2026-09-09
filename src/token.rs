@@ -29,7 +29,7 @@ enum TokenType {
     GREATER_EQUAL,
 
     STRING,
-    NUMERIC,
+    NUMBER,
 
     EOF,
 }
@@ -73,7 +73,7 @@ impl Token {
                 if lexeme.starts_with('"') && lexeme.ends_with('"') {
                     TokenType::STRING
                 } else if lexeme.chars().any(|c| c.is_numeric()) {
-                    TokenType::NUMERIC
+                    TokenType::NUMBER
                 } else {
                     return None;
                 }
@@ -81,7 +81,7 @@ impl Token {
         };
         if token_type == TokenType::STRING {
             literal = format_str(lexeme);
-        } else if token_type == TokenType::NUMERIC {
+        } else if token_type == TokenType::NUMBER {
             let num: f64 = lexeme.parse().unwrap();
             let format_num: Formatter = "[.*]".parse().unwrap();
             literal = format_num.fmt_string(num);
