@@ -1,4 +1,3 @@
-use numfmt::{Formatter, Precision};
 use std::{char, fmt::Display};
 
 #[allow(non_camel_case_types)]
@@ -30,7 +29,6 @@ enum TokenType {
 
     STRING,
     NUMBER,
-
     EOF,
 }
 
@@ -83,8 +81,7 @@ impl Token {
             literal = format_str(lexeme);
         } else if token_type == TokenType::NUMBER {
             let num: f64 = lexeme.parse().unwrap();
-            let format_num: Formatter = "[.*]".parse().unwrap();
-            literal = format_num.fmt_string(num);
+            literal = format!("{:?}", num);
         }
         Some(Token {
             token_type,
@@ -171,8 +168,11 @@ fn check_multi_char<'a>(
             if content[i].is_numeric() || content[i].eq(&'.') {
                 str_num.push(content[i]);
             } else {
-                *char_index = i;
+                *char_index = i - 1;
                 break;
+            }
+            if i == content.len() - 1 {
+                *char_index = i;
             }
         }
         return Some(str_num);
