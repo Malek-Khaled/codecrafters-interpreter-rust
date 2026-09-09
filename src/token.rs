@@ -48,7 +48,6 @@ pub struct Token {
 }
 impl Token {
     pub fn new(lexeme: &str) -> Option<Token> {
-        dbg!(lexeme);
         let mut literal = String::from("null");
         let token_type = match lexeme {
             "(" => TokenType::LEFT_PAREN,
@@ -73,7 +72,7 @@ impl Token {
             _ => {
                 if lexeme.starts_with('"') && lexeme.ends_with('"') {
                     TokenType::STRING
-                } else if literal.chars().any(|c| c.is_numeric()) {
+                } else if lexeme.chars().any(|c| c.is_numeric()) {
                     TokenType::NUMERIC
                 } else {
                     return None;
@@ -83,7 +82,7 @@ impl Token {
         if token_type == TokenType::STRING {
             literal = format_str(lexeme);
         } else if token_type == TokenType::NUMERIC {
-            let num: i32 = lexeme.parse().unwrap();
+            let num: f64 = lexeme.parse().unwrap();
             let format_num: Formatter = "[.*]".parse().unwrap();
             literal = format_num.fmt_string(num);
         }
